@@ -4,20 +4,19 @@
  * @param {string} [param="asc"] param - the sorting type "asc" or "desc"
  * @returns {string[]}
  */
-
 const SortTypes = {
   ASC: 'asc',
   DESC: 'desc'
 };
 
-const OptionsForLocalCompareMethod = {
-  caseFirst: 'upper'
+const Direction = {
+  [SortTypes.ASC]: 1,
+  [SortTypes.DESC]: -1
 };
 
-const compareString = (sortType) => (a, b) => 
-  SortTypes.ASC === sortType 
-    ? a.localeCompare(b, undefined, OptionsForLocalCompareMethod) 
-    : b.localeCompare(a, undefined, OptionsForLocalCompareMethod);
+const compareString = (sortType) => {
+  return (stringA, stringB) => stringA.localeCompare(stringB, ['ru', 'en'], {caseFirst: 'upper'}) * Direction[sortType];
+};
 
 export function sortStrings (arr, param = SortTypes.ASC) {
   return [...arr].sort(compareString(param));
