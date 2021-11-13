@@ -5,5 +5,13 @@
  * @returns {object} - returns the new object
  */
 export const omit = (obj, ...fields) => {
+  return Object
+    .entries(obj)
+    .reduce((acc, [key, value]) => {
+      if (!fields.includes(key)) {
+        acc[key] = value;
+      }
 
+      return acc;
+    }, {});
 };
