@@ -7,11 +7,11 @@ export function invertObj(obj) {
   if (!obj) {
     return;
   }
-  
+
   return Object
     .entries(obj)
     .reduce(
-      (acc, [key, value]) => typeof value === 'string'
+      (acc, [key, value]) => typeof value !== 'object'
         ? ({...acc, [value]: key })
         : acc,
       {}
