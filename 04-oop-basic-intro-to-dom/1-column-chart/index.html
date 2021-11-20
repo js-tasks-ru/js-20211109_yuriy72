@@ -43,6 +43,11 @@
       orders.append(ordersChart.element);
       sales.append(salesChart.element);
       customers.append(customersChart.element);
+
+    
+      setTimeout(() => {
+        ordersChart.update(salesData);
+      }, 3000)
     </script>
   </body>
 </html>
