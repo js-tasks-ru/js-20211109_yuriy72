@@ -38,7 +38,7 @@
       template: (data = []) => {
         return `
           <div class="sortable-table__cell">
-            <img class="sortable-table-image" alt="Image" src="${data[0]?.url || 'https://via.placeholder.com/32'}">
+            <img class="sortable-table-image" alt="Image" src="${data[0]?.images?.url[0] || 'https://via.placeholder.com/32'}">
           </div>
         `;
       }
@@ -46,7 +46,7 @@
     {
       id: 'title',
       title: 'Name',
-      sortable: true,
+      sortable: false,
       sortType: 'string'
     },
     {
