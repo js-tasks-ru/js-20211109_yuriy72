@@ -81,9 +81,11 @@ class Tooltip extends Component {
 
   handlePointerMove = (evt) => {
     const { clientX, clientY } = evt;
+    const leftPos = clientX + 5;
+    const topPos = clientY + 5;
 
-    this.element.style.left = `${clientX}px`;
-    this.element.style.top = `${clientY}px`;
+    this.element.style.left = `${leftPos}px`;
+    this.element.style.top = `${topPos}px`;
   }
 
   handlePointerOver = (evt) => {

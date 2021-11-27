@@ -89,14 +89,14 @@ export default class SortableTable extends Component {
       const currentArrow = column.querySelector('[data-element="arrow"]');
 
       const newDirection = this.toggleDirectionArrow(order);   
-      const find = [...allSortableColumns].find(it => it.dataset.id === id);
+      const findColumn = [...allSortableColumns].find(it => it.dataset.id === id);
 
 
       if (!currentArrow) {
         column.append(arrow);
       }
 
-      find.dataset.order = newDirection;
+      findColumn.dataset.order = newDirection;
 
       this.sort(id, newDirection);
     }
