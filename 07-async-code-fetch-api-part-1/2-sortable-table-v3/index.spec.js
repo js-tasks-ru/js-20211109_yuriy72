@@ -1,4 +1,4 @@
-import SortableTable from '../solution/index.js';
+import SortableTable from '../2-sortable-table-v3/index.js';
 
 import { products, bestsellers } from './__mocks__/products-data.js';
 
