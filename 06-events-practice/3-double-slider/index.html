@@ -10,8 +10,22 @@
   <script type="module">
     import DoubleSlider from './index.js';
 
-    const slider = new DoubleSlider();
+    const options = {
+      min: 100,
+      max: 800,
+      formatValue: value => '$' + value,
+      selected: {
+        from: 400,
+        to: 600
+      },
+    }
+
+    const slider = new DoubleSlider(options);
 
     root.append(slider.element);
+
+    document.addEventListener('range-select', ({detail}) => {
+      console.log(detail)
+    })
   </script>
 </body>

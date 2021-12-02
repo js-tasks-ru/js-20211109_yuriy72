@@ -55,9 +55,19 @@
   ];
 
   const sortableTable = new SortableTable(header, {
-    url: 'api/rest/products'
+    url: 'api/rest/products',  
+    isSortLocally: false,
+    sorted: {
+      id: header.find(item => item.sortable).id,
+      order: 'asc'
+    }
   });
 
+  (async () => {
+    await sortableTable.render();
+  })()
+
   root.append(sortableTable.element);
+
 </script>
 </body>
