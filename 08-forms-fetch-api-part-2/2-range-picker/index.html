@@ -21,10 +21,12 @@
 
 <script type="module">
   import RangePicker from './index.js';
+  const from = new Date(2020, 5, 8);
+  const to = new Date(2020, 6, 13);
 
   const rangePicker = new RangePicker({
-    from: new Date(2019, 9, 2),
-    to: new Date(2019, 10, 5)
+    from,
+    to
   });
 
   holder.append(rangePicker.element);
