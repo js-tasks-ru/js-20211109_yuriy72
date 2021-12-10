@@ -80,6 +80,7 @@ class Component {
     return createElement(template);
   }
 }
+
 export default class SortableList extends Component {
   handleRemoveElement = ({ target }) => {
     const element = target.closest('.sortable-list__item'); 
@@ -252,3 +253,4 @@ export default class SortableList extends Component {
     root.addEventListener('pointerdown', this.handleSortElement);
   }
 }
+
