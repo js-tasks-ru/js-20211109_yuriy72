@@ -1,122 +1,125 @@
+import Component from '../../../core/component.js';
 import fetchJson from '../../../utils/fetch-json.js';
-
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
-export default class ColumnChart {
-  element;
-  subElements = {};
-  chartHeight = 50;
+export default class ColumnChart extends Component {
+  constructor(
+    {
+      data = [], 
+      url = '', 
+      label = '', 
+      formatHeading = (it) => it, 
+      link = '', 
+      range = {
+        from: new Date('2020-04-06'),
+        to: new Date('2020-05-06'),
+      },
+      value = ''
+    } = {}
+  ) {
+    super();
 
-  constructor({
-    label = '',
-    link = '',
-    formatHeading = data => data,
-    url = '',
-    range = {
-      from: new Date(),
-      to: new Date(),
-    }
-  } = {}) {
+    this.data = data;
+    this.value = value;
+    this.label = label;
+
+
     this.url = new URL(url, BACKEND_URL);
     this.range = range;
-    this.label = label;
+
+
     this.link = link;
     this.formatHeading = formatHeading;
 
-    this.render();
+    this.maxHeight = 50;
   }
 
-  render() {
-    const { from, to } = this.range;
-    const element = document.createElement('div');
-
-    element.innerHTML = this.template;
-
-    this.element = element.firstElementChild;
-    this.subElements = this.getSubElements(this.element);
-
-    this.loadData(from, to);
-  }
-
-  getHeaderValue(data) {
-    return this.formatHeading(Object.values(data).reduce((accum, item) => (accum + item), 0));
-  }
-
-  async loadData(from, to) {
-    this.element.classList.add('column-chart_loading');
-    this.subElements.header.textContent = '';
-    this.subElements.body.innerHTML = '';
-
-    this.url.searchParams.set('from', from.toISOString());
-    this.url.searchParams.set('to', to.toISOString());
+  async handleLoadData(from, to) {
+    this.url.searchParams.set('to', new Date(to).toISOString());
+    this.url.searchParams.set('from', new Date(from).toISOString());
 
     const data = await fetchJson(this.url);
 
-    this.setNewRange(from, to);
+    return Object.values(data).length 
+      ? data
+      : {};
+  }
 
-    if (data && Object.values(data).length) {
-      this.subElements.header.textContent = this.getHeaderValue(data);
-      this.subElements.body.innerHTML = this.getColumnBody(data);
+ 
+  get chartHeight() {
+    return this.maxHeight;
+  }
 
-      this.element.classList.remove('column-chart_loading');
+  get template() { 
+    return (
+      `<div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
+          <div class="column-chart__title">
+            ${this.getLabel()}
+            ${this.getLink()}
+          </div>
+          <div class="column-chart__container">
+            <div data-element="header" class="column-chart__header"></div>
+              <div data-element="body" class="column-chart__chart"></div>
+          </div>
+      </div>`
+    );
+  }
+
+  async render() {
+    const { from, to } = this.range;
+    
+    const data = await this.handleLoadData(from, to);
+    this.data = data;
+    
+    
+    if (data) {
+      this.refToElement.classList.remove('column-chart_loading');
+      this.getChildElementByName('body').innerHTML = this.getColumnChart(data);
+      this.getChildElementByName('header').innerHTML = this.getHeader(data);
     }
   }
 
-  setNewRange(from, to) {
-    this.range.from = from;
-    this.range.to = to;
+  async update(from, to) {
+    const data = await this.handleLoadData(from, to);
+    this.range = { from, to };
+    this.getChildElementByName('body').innerHTML = this.getColumnChart(data);
+    this.getChildElementByName('header').innerHTML = this.getHeader(data);
+
+    this.data = data;
+    return data;
   }
 
-  getColumnBody(data) {
-    const maxValue = Math.max(...Object.values(data));
+  getColumnChart(data) {
+    const viewData = this.getDataFromView(data);
+    const max = Math.max(...viewData.map(({value}) => value));
+    const scale = this.chartHeight / max;
 
-    return Object.entries(data).map(([key, value]) => {
-      const scale = this.chartHeight / maxValue;
-      const percent = (value / maxValue * 100).toFixed(0);
-      const tooltip = `<span>
-        <small>${key.toLocaleString('default', {dateStyle: 'medium'})}</small>
-        <br>
-        <strong>${percent}%</strong>
-      </span>`;
+    const getPercent = (item) => (item / max * 100).toFixed(0);
 
-      return `<div style="--value: ${Math.floor(value * scale)}" data-tooltip="${tooltip}"></div>`;
-    }).join('');
+    return viewData
+      .map(
+        ({ value }) => (`<div style="--value: ${Math.floor(value * scale)}" data-tooltip="${getPercent(value)}%"></div>`)
+      )
+      .join('');
   }
 
   getLink() {
-    return this.link ? `<a class="column-chart__link" href="${this.link}">View all</a>` : '';
+    return this.link ? `<a href="/${this.link}" class="column-chart__link">View all</a>` : '';
   }
 
-  get template() {
-    return `
-      <div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
-        <div class="column-chart__title">
-          Total ${this.label}
-          ${this.getLink()}
-        </div>
-        <div class="column-chart__container">
-          <div data-element="header" class="column-chart__header"></div>
-          <div data-element="body" class="column-chart__chart"></div>
-        </div>
-      </div>
-    `;
+  getHeader(data) {
+    const max = this.getDataFromView(data).reduce((acc, { value }) => acc + value, 0);
+
+    return this.formatHeading(max);
   }
 
-  getSubElements(element) {
-    const elements = element.querySelectorAll('[data-element]');
-
-    return [...elements].reduce((accum, subElement) => {
-      accum[subElement.dataset.element] = subElement;
-
-      return accum;
-    }, {});
+  getLabel() {
+    return this.label ? this.label : '';
   }
 
-  async update(from, to) {
-    return await this.loadData(from, to);
-  }
-
-  destroy() {
-    this.element.remove();
+  getDataFromView(data) {
+    return Object.values(data).length 
+      ? Object.entries(data).map(([key, value]) => ({ key, value }))
+      : [];
   }
 }
