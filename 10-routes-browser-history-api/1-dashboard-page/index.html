@@ -55,18 +55,30 @@
 </main>
 
 <script type="module">
-  import Page from './index.js';
+  import Dashboard from './index.js';
 
-  const contentNode = document.querySelector('#content');
 
-  async function initialize () {
-    const page = new Page();
-    const element = await page.render();
-
-    contentNode.innerHTML = '';
-    contentNode.append(element);
+  const drawerToggler = document.querySelector('.sidebar__toggler');
+  const progressBar = document.querySelector('.progress-bar');
+  
+  function toggleDrawerVisibility() {
+    document.body.classList.toggle('is-collapsed-sidebar');
   }
 
-  initialize();
+  drawerToggler.addEventListener('pointerdown', toggleDrawerVisibility);
+
+  const contentNode = document.querySelector('#content');
+  const page = new Dashboard();
+  const element = await page.render()
+  progressBar.style.display = 'none';
+  
+
+  contentNode.innerHTML = '';
+  contentNode.append(element);
+
+
+
+  // пример уничтожения экрана
+  // setTimeout(() => page.destroy(), 4000);
 </script>
 </body>
